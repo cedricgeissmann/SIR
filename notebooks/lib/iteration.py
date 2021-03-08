@@ -19,7 +19,7 @@ def sir_modell(x, **kwargs):
     return [S_new, I_new, R_new]
 
 
-def iteration(f, x0, n=10, cond=lambda: False, **kwargs):
+def iteration(f, x0, n=10, cond=lambda x: False, **kwargs):
     """
     Führt eine Iteration der Funktion f durch.
 
