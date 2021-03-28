@@ -8,24 +8,29 @@ import numpy as np
 def sir_modell(x, **kwargs):
     """Iterationsfunktion für das SIR-Modell."""
     x_elem = list(x)
-    assert len(x_elem) == 3
+    assert len(x_elem) == 4
     a = kwargs.get("a")
     b = kwargs.get("b")
     c = kwargs.get("c")
+    d = kwargs.get('d', 0)
     daily_fluctuations = kwargs.get('daily_fluctuations', 0.1)
 
     a = a * uniform(1-daily_fluctuations, 1+daily_fluctuations)
     b = b * uniform(1-daily_fluctuations, 1+daily_fluctuations)
     c = c * uniform(1-daily_fluctuations, 1+daily_fluctuations)
+    d = d * uniform(1-daily_fluctuations, 1+daily_fluctuations)
+
     S = x[0]
     I = x[1]
     R = x[2]
+    V = x[3]
 
-    S_new = S - a * S * I + b * I
+    S_new = S - a * S * I + b * I - d * S
     I_new = I + a * S * I - b * I - c * I
     R_new = R + c * I
+    V_new = V + d * S
 
-    return [S_new, I_new, R_new]
+    return [S_new, I_new, R_new, V_new]
 
 
 def iteration(f, x0, n=10, cond=lambda x: False, **kwargs):
