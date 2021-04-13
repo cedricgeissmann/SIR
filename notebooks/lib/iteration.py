@@ -8,7 +8,7 @@ import numpy as np
 def sir_modell(x, **kwargs):
     """Iterationsfunktion für das SIR-Modell."""
     x_elem = list(x)
-    assert len(x_elem) == 5
+    assert len(x_elem) == 7
     a = kwargs.get("a")
     b = kwargs.get("b")
     c = kwargs.get("c")
@@ -16,6 +16,10 @@ def sir_modell(x, **kwargs):
     e = kwargs.get('e', 0)
     f = kwargs.get('f', 0)
     k = kwargs.get('k', 0)
+    g = kwargs.get('g', 0)
+    h = kwargs.get('h', 0)
+    i = kwargs.get('i', 0)
+    j = kwargs.get('j', 0)
     daily_fluctuations = kwargs.get('daily_fluctuations', 0.1)
 
     a = a * uniform(1-daily_fluctuations, 1+daily_fluctuations)
@@ -28,14 +32,18 @@ def sir_modell(x, **kwargs):
     R = x[2]
     D = x[3]
     V = x[4]
+    VI = x[5]
+    T = x[6]
 
-    S_new = S - a * S * I + b * I - d * S + e * R + f * V
-    I_new = I + a * S * I - b * I - c * I - k * I
-    R_new = R + c * I - e * R
+    S_new = S - a * S * I + b * I - d * S + e * R + f * V - h * VI * S - j * T * S
+    I_new = I + a * S * I - b * I - c * I - k * I - g * V * I + h * VI * S + j * T * S
+    R_new = R + c * I - e * R + b * VI
     D_new = D + k * I
     V_new = V + d * S - f * V
+    VI_new = VI + g * V * I - b * VI
+    T_new = T + i * I - b * T
 
-    return [S_new, I_new, R_new, D_new, V_new]
+    return [S_new, I_new, R_new, D_new, V_new, VI_new, T_new]
 
 
 def iteration(func, x0, n=10, cond=lambda x: False, **kwargs):
@@ -74,13 +82,14 @@ def plot_iteration(iter_list, **kwargs):
     iter_list: ist die Rückgabe der Funktion iteration.
     """
     highlight = kwargs.get('highlight', None)
-    labels = ['Suseptible', 'Infected', 'Removed', 'Dead', 'Vaccinated']
+    labels = ['Suseptible', 'Infected', 'Removed', 'Dead', 'Vaccinated', 'VI', 'FN-Tested']
+    plt.subplot(211)
     for (li, lab) in zip(iter_list, labels):
         if highlight and lab in highlight.keys():
             plt.plot(li, label=lab, **highlight.get(lab))
         else:
             plt.plot(li, label=lab)
-    plt.legend()
+    plt.legend(bbox_to_anchor=(0, 1, 1, 0), loc="lower left", mode="expand", ncol=3)
     plt.show()
 
 
