@@ -8,11 +8,14 @@ import numpy as np
 def sir_modell(x, **kwargs):
     """Iterationsfunktion für das SIR-Modell."""
     x_elem = list(x)
-    assert len(x_elem) == 4
+    assert len(x_elem) == 5
     a = kwargs.get("a")
     b = kwargs.get("b")
     c = kwargs.get("c")
     d = kwargs.get('d', 0)
+    e = kwargs.get('e', 0)
+    f = kwargs.get('f', 0)
+    k = kwargs.get('k', 0)
     daily_fluctuations = kwargs.get('daily_fluctuations', 0.1)
 
     a = a * uniform(1-daily_fluctuations, 1+daily_fluctuations)
@@ -23,17 +26,19 @@ def sir_modell(x, **kwargs):
     S = x[0]
     I = x[1]
     R = x[2]
-    V = x[3]
+    D = x[3]
+    V = x[4]
 
-    S_new = S - a * S * I + b * I - d * S
-    I_new = I + a * S * I - b * I - c * I
-    R_new = R + c * I
-    V_new = V + d * S
+    S_new = S - a * S * I + b * I - d * S + e * R + f * V
+    I_new = I + a * S * I - b * I - c * I - k * I
+    R_new = R + c * I - e * R
+    D_new = D + k * I
+    V_new = V + d * S - f * V
 
-    return [S_new, I_new, R_new, V_new]
+    return [S_new, I_new, R_new, D_new, V_new]
 
 
-def iteration(f, x0, n=10, cond=lambda x: False, **kwargs):
+def iteration(func, x0, n=10, cond=lambda x: False, **kwargs):
     """
     Führt eine Iteration der Funktion f durch.
 
@@ -49,18 +54,33 @@ def iteration(f, x0, n=10, cond=lambda x: False, **kwargs):
         if cond(x_list):
             print("Bedingung erfüllt für Element x" + str(i))
             return
-        x_elem = f(x_list[-1], **kwargs)
+
+        events = kwargs.get('events', None)
+        if events:
+            if i in events.keys():
+                obj = events.get(i)
+                for (k, v) in obj.items():
+                    kwargs[k] = v
+
+        x_elem = func(x_list[-1], **kwargs)
         x_list.append(x_elem)
-    return x_list
+    return simple_remap(x_list)
 
 
-def plot_iteration(iter_list):
+def plot_iteration(iter_list, **kwargs):
     """
     Plottet die Iterationen des Räuber-Beute-Modells.
 
     iter_list: ist die Rückgabe der Funktion iteration.
     """
-    plt.plot(iter_list)
+    highlight = kwargs.get('highlight', None)
+    labels = ['Suseptible', 'Infected', 'Removed', 'Dead', 'Vaccinated']
+    for (li, lab) in zip(iter_list, labels):
+        if highlight and lab in highlight.keys():
+            plt.plot(li, label=lab, **highlight.get(lab))
+        else:
+            plt.plot(li, label=lab)
+    plt.legend()
     plt.show()
 
 
