@@ -35,6 +35,13 @@ def sir_modell(x, **kwargs):
     VI = x[5]
     T = x[6]
 
+    N = sum(x)
+
+    a = a / N
+    h = h / N
+    j = j / N
+    g = g / N
+
     S_new = S - a * S * I + b * I - d * S + e * R + f * V - h * VI * S - j * T * S
     I_new = I + a * S * I - b * I - c * I - k * I - g * V * I + h * VI * S + j * T * S
     R_new = R + c * I - e * R + b * VI
