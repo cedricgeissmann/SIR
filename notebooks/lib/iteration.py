@@ -89,13 +89,16 @@ def plot_iteration(iter_list, **kwargs):
     iter_list: ist die Rückgabe der Funktion iteration.
     """
     highlight = kwargs.get('highlight', None)
+    to_print = kwargs.get('to_plot', {})
     labels = ['Suseptible', 'Infected', 'Removed', 'Dead', 'Vaccinated', 'VI', 'FN-Tested']
-    plt.subplot(211)
+    plot=plt.subplot(211)
+    print(to_print)
     for (li, lab) in zip(iter_list, labels):
-        if highlight and lab in highlight.keys():
-            plt.plot(li, label=lab, **highlight.get(lab))
-        else:
-            plt.plot(li, label=lab)
+        if to_print[lab]:
+            if highlight and lab in highlight.keys():
+                plt.plot(li, label=lab, **highlight.get(lab))
+            else:
+                plt.plot(li, label=lab)
     plt.legend(bbox_to_anchor=(0, 1, 1, 0), loc="lower left", mode="expand", ncol=3)
     plt.show()
 
