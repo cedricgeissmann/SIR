@@ -92,7 +92,6 @@ def plot_iteration(iter_list, **kwargs):
     to_print = kwargs.get('to_plot', {})
     labels = ['Suseptible', 'Infected', 'Removed', 'Dead', 'Vaccinated', 'VI', 'FN-Tested']
     plot=plt.subplot(211)
-    print(to_print)
     for (li, lab) in zip(iter_list, labels):
         if to_print[lab]:
             if highlight and lab in highlight.keys():
